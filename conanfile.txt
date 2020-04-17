@@ -1,0 +1,11 @@
+[requires]
+imgui-sfml/2.1@bincrafters/stable
+
+[options]
+sfml:graphics=True
+sfml:window=True
+sfml:audio=False
+sfml:network=False
+
+[generators]
+cmake
