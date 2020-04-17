@@ -60,6 +60,7 @@ int main()
         }
 
         if (metronome.getElapsedTime().asSeconds() >= 60. / float(BPM)) {
+            //TODO: Add beeps and boops, sound is easier to follow than just a flashing bar
             metronome.restart();
 
             if (beat == 1) {
