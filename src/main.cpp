@@ -5,14 +5,16 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
-const sf::Vector2f windowSize(640, 480);
-constexpr int border = 20;
-int BPM = 130;
+const sf::Vector2f windowSize(960, 480);
+const sf::Color background(50, 50, 50);
+constexpr int margin = 50;
+int BPM = 120;
 
-const sf::Vector2f barSize(20, 100);
+const sf::Vector2f barSize(40, 200);
+const sf::Vector2f markerSize(2, 50);
 
 int signature = 4;
-int prevSignature = 4;
+int prevSignature = 0;
 const int minSignature = 2;
 const int maxSignature = 16;
 
@@ -27,9 +29,18 @@ int main()
     ImGui::SFML::Init(window);
 
     sf::RectangleShape bar(barSize);
-    bar.setOrigin(0.5f * bar.getSize());
-    bar.setPosition(border, windowSize.y / 2);
+    bar.setOrigin(0.5f * barSize);
+    bar.setPosition(margin, windowSize.y / 2);
     bar.setFillColor(sf::Color(220, 220, 220));
+
+    sf::RectangleShape midLine(sf::Vector2f(windowSize.x - (2 * margin), 1));
+    midLine.setOrigin(0.5f * midLine.getSize());
+    midLine.setPosition(windowSize * 0.5f);
+
+    sf::RectangleShape marker(markerSize);
+    marker.setFillColor(sf::Color(150, 150, 150));
+    marker.setOrigin(0.5f * markerSize);
+    
 
     sf::Clock deltaClock;
     sf::Clock metronome;
@@ -43,6 +54,22 @@ int main()
                 if (event.key.code == sf::Keyboard::Escape) {
                     window.close();
                 }
+
+                if (event.key.code == sf::Keyboard::Up) {
+                    BPM++;
+                }
+
+                if (event.key.code == sf::Keyboard::Down) {
+                    BPM--;
+                }
+
+                if (event.key.code == sf::Keyboard::Left) {
+                    signature--;
+                }
+
+                if (event.key.code == sf::Keyboard::Right) {
+                    signature++;
+                }
             }
 
             if (event.type == sf::Event::Closed) {
@@ -52,11 +79,12 @@ int main()
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        float step = (windowSize.x - (2 * border)) / (signature - 1);
+        float step = (windowSize.x - (2 * margin)) / (signature - 1);
 
         if (signature != prevSignature) {
             prevSignature = signature;
             beat = 1;
+
         }
 
         if (metronome.getElapsedTime().asSeconds() >= 60. / float(BPM)) {
@@ -66,10 +94,10 @@ int main()
             if (beat == 1) {
                 bar.setScale(sf::Vector2f(1, 1.5));
                 bar.setFillColor(sf::Color(220, 220, 220));
-                bar.setPosition(border, windowSize.y / 2);
+                bar.setPosition(margin, windowSize.y / 2);
             } else {
                 bar.setScale(sf::Vector2f(1, 1));
-                bar.setFillColor(sf::Color(120, 120, 120));
+                bar.setFillColor(sf::Color(150, 150, 150));
                 bar.move(sf::Vector2f(step, 0));
             }
 
@@ -80,8 +108,10 @@ int main()
             }
         }
 
+        bar.setScale(0.98f * bar.getScale());
+
         ImGui::Begin("Settings");
-        ImGui::InputInt("Beats per bar", &signature);
+        ImGui::InputInt("Beats per measure", &signature);
         ImGui::InputInt("BPM", &BPM);
         ImGui::End();
 
@@ -100,7 +130,13 @@ int main()
         if (BPM < minBPM) {
             BPM = minBPM;
         }
-        window.clear();
+
+        window.clear(background);
+        for (int i = 0; i < signature; i++) {
+            marker.setPosition(margin + (step * i), windowSize.y / 2);
+            window.draw(marker);
+        }
+        window.draw(midLine);
         window.draw(bar);
         ImGui::SFML::Render(window);
         window.display();
