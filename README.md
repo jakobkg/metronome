@@ -1,6 +1,6 @@
 # metronome
 
-Basic metronome built in C++ on top of ImGui-SFML
+Basic metronome built in C++ on top of Dear ImGui and SFML
 
 To build, do:
 ```bash

@@ -1,5 +1,9 @@
+#include <math.h>
+#include <sstream>
+
 #include <imgui.h>
 #include <imgui-SFML.h>
+#include <imgui_stdlib.h>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
@@ -10,7 +14,7 @@ const sf::Color background(50, 50, 50);
 constexpr int margin = 50;
 int BPM = 120;
 
-const sf::Vector2f barSize(40, 200);
+const sf::Vector2f barSize(30, 300);
 const sf::Vector2f markerSize(2, 50);
 
 int signature = 4;
@@ -21,6 +25,9 @@ const int maxSignature = 16;
 int beat = 1;
 const int minBPM = 30;
 const int maxBPM = 300;
+
+std::string accentstring = "1";
+std::vector<int> accents;
 
 int main()
 {
@@ -87,18 +94,26 @@ int main()
 
         }
 
+        accents.clear();
+
         if (metronome.getElapsedTime().asSeconds() >= 60. / float(BPM)) {
             //TODO: Add beeps and boops, sound is easier to follow than just a flashing bar
             metronome.restart();
 
-            if (beat == 1) {
+            std::stringstream iss(accentstring);
+            int accent;
+            while (iss >> accent) {
+                accents.push_back(accent);
+            }
+            
+            bar.setPosition(sf::Vector2f(margin + (step * (beat - 1)), windowSize.y / 2));
+
+            if (std::find(accents.begin(), accents.end(), beat) != accents.end()) {
                 bar.setScale(sf::Vector2f(1, 1.5));
                 bar.setFillColor(sf::Color(220, 220, 220));
-                bar.setPosition(margin, windowSize.y / 2);
             } else {
                 bar.setScale(sf::Vector2f(1, 1));
                 bar.setFillColor(sf::Color(150, 150, 150));
-                bar.move(sf::Vector2f(step, 0));
             }
 
             if (beat == signature) {
@@ -108,11 +123,17 @@ int main()
             }
         }
 
-        bar.setScale(0.98f * bar.getScale());
+        bar.setScale(0.97f * bar.getScale());
+        bar.move(sf::Vector2f((windowSize.x - (2 * margin)) * 2.7 / (BPM * signature), 0));
+
+        if (bar.getPosition().x > windowSize.x - margin) {
+            bar.setPosition(sf::Vector2f(windowSize.x - margin, windowSize.y / 2));
+        }
 
         ImGui::Begin("Settings");
         ImGui::InputInt("Beats per measure", &signature);
         ImGui::InputInt("BPM", &BPM);
+        ImGui::InputText("Accents", &accentstring);
         ImGui::End();
 
         if (signature > maxSignature) {
