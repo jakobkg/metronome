@@ -13,7 +13,10 @@
 const sf::Vector2f windowSize(960, 480);
 const sf::Color background(50, 50, 50);
 constexpr int margin = 50;
+
 int BPM = 120;
+const int minBPM = 30;
+const int maxBPM = 300;
 
 const sf::Vector2f barSize(30, 300);
 const sf::Vector2f markerSize(2, 50);
@@ -24,8 +27,6 @@ const int minSignature = 2;
 const int maxSignature = 32;
 
 int beat = 1;
-const int minBPM = 30;
-const int maxBPM = 300;
 
 std::string accentstring = "1";
 std::vector<int> accents;
@@ -35,6 +36,9 @@ int main()
     sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "metronome");
     window.setFramerateLimit(120);
     ImGui::SFML::Init(window);
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = NULL;
 
     sf::RectangleShape bar(barSize);
     bar.setOrigin(0.5f * barSize);
