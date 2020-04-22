@@ -7,4 +7,9 @@ conan_basic_setup()
 
 add_executable(metronome src/main.cpp) 
 target_link_libraries(metronome ${CONAN_LIBS})
-target_compile_options(metronome PUBLIC -Wall -Wextra -Werror)
+
+file(COPY snd DESTINATION bin)
+
+if(NOT MSVC)
+    target_compile_options(metronome PUBLIC -Wall -Wextra -Werror)
+endif()

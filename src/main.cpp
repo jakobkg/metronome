@@ -5,6 +5,7 @@
 #include <imgui-SFML.h>
 #include <imgui_stdlib.h>
 
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
@@ -20,7 +21,7 @@ const sf::Vector2f markerSize(2, 50);
 int signature = 4;
 int prevSignature = 0;
 const int minSignature = 2;
-const int maxSignature = 16;
+const int maxSignature = 32;
 
 int beat = 1;
 const int minBPM = 30;
@@ -47,6 +48,22 @@ int main()
     sf::RectangleShape marker(markerSize);
     marker.setFillColor(sf::Color(150, 150, 150));
     marker.setOrigin(0.5f * markerSize);
+
+    
+    sf::SoundBuffer lobuf, hibuf;
+
+    if (!lobuf.loadFromFile("snd/low.wav")) {
+        return -1;
+        }
+
+    if (!hibuf.loadFromFile("snd/high.wav")) {
+        return -1;
+        }
+    
+    sf::Sound high, low;
+    
+    high.setBuffer(hibuf);
+    low.setBuffer(lobuf);
     
 
     sf::Clock deltaClock;
@@ -109,9 +126,11 @@ int main()
             bar.setPosition(sf::Vector2f(margin + (step * (beat - 1)), windowSize.y / 2));
 
             if (std::find(accents.begin(), accents.end(), beat) != accents.end()) {
+                high.play();
                 bar.setScale(sf::Vector2f(1, 1.5));
                 bar.setFillColor(sf::Color(220, 220, 220));
             } else {
+                low.play();
                 bar.setScale(sf::Vector2f(1, 1));
                 bar.setFillColor(sf::Color(150, 150, 150));
             }
