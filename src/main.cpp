@@ -1,4 +1,3 @@
-#include <math.h>
 #include <sstream>
 
 #include <imgui.h>
@@ -10,7 +9,7 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
-const sf::Vector2f windowSize(960, 480);
+const sf::Vector2f windowSize(1440, 480);
 const sf::Color background(50, 50, 50);
 constexpr int margin = 50;
 
