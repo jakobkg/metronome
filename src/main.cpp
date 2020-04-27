@@ -148,7 +148,9 @@ int main()
         ImGui::InputInt("BPM", &BPM);
         
         for (int i = 0; i < signature; i++) {
-            ImGui::Checkbox("##", &accents[i]);
+            ImGui::PushID(i);
+            ImGui::Checkbox("", &accents[i]);
+            ImGui::PopID();
             ImGui::SameLine();
         }
 
