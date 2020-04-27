@@ -27,8 +27,7 @@ const int maxSignature = 32;
 
 int beat = 1;
 
-std::string accentstring = "1";
-std::vector<int> accents;
+bool accents[maxSignature] = {false};
 
 int main()
 {
@@ -52,6 +51,7 @@ int main()
     marker.setFillColor(sf::Color(150, 150, 150));
     marker.setOrigin(0.5f * markerSize);
 
+    accents[0] = true;
     
     sf::SoundBuffer lobuf, hibuf;
 
@@ -114,20 +114,12 @@ int main()
 
         }
 
-        accents.clear();
-
         if (metronome.getElapsedTime().asSeconds() >= 60. / float(BPM)) {
             metronome.restart();
-
-            std::stringstream iss(accentstring);
-            int accent;
-            while (iss >> accent) {
-                accents.push_back(accent);
-            }
             
             bar.setPosition(sf::Vector2f(margin + (step * (beat - 1)), windowSize.y / 2));
 
-            if (std::find(accents.begin(), accents.end(), beat) != accents.end()) {
+            if (accents[beat - 1]) {
                 high.play();
                 bar.setScale(sf::Vector2f(1, 1.5));
                 bar.setFillColor(sf::Color(220, 220, 220));
@@ -154,7 +146,12 @@ int main()
         ImGui::Begin("Settings");
         ImGui::InputInt("Beats per measure", &signature);
         ImGui::InputInt("BPM", &BPM);
-        ImGui::InputText("Accents", &accentstring);
+        
+        for (int i = 0; i < signature; i++) {
+            ImGui::Checkbox("##", &accents[i]);
+            ImGui::SameLine();
+        }
+
         ImGui::End();
 
         if (signature > maxSignature) {
