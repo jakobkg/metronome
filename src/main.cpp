@@ -9,13 +9,16 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
-const sf::Vector2f windowSize(1440, 480);
+
+constexpr int windowWidth = 1440;
+constexpr int windowHeight = 480;
+const sf::Vector2f windowSize(windowWidth, windowHeight);
 const sf::Color background(40, 40, 40);
 constexpr int margin = 50;
 
 int BPM = 120;
-const int minBPM = 30;
-const int maxBPM = 300;
+constexpr int minBPM = 30;
+constexpr int maxBPM = 300;
 
 const sf::Vector2f barSize(30, 300);
 const sf::Vector2f markerSize(2, 50);
@@ -25,8 +28,8 @@ const sf::Color accentMarkerColor(210, 210, 210);
 
 int signature = 4;
 int prevSignature = 0;
-const int minSignature = 2;
-const int maxSignature = 32;
+constexpr int minSignature = 2;
+constexpr int maxSignature = 32;
 
 int beat = 1;
 
@@ -34,7 +37,7 @@ bool accents[maxSignature] = {false};
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "metronome");
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "metronome");
     window.setFramerateLimit(120);
     ImGui::SFML::Init(window);
 
