@@ -10,7 +10,7 @@
 #include <SFML/Window/Event.hpp>
 
 const sf::Vector2f windowSize(1440, 480);
-const sf::Color background(50, 50, 50);
+const sf::Color background(40, 40, 40);
 constexpr int margin = 50;
 
 int BPM = 120;
@@ -19,6 +19,9 @@ const int maxBPM = 300;
 
 const sf::Vector2f barSize(30, 300);
 const sf::Vector2f markerSize(2, 50);
+const sf::Vector2f accentMarkerSize(4, 75);
+const sf::Color markerColor(180, 180, 180);
+const sf::Color accentMarkerColor(210, 210, 210);
 
 int signature = 4;
 int prevSignature = 0;
@@ -41,14 +44,15 @@ int main()
     sf::RectangleShape bar(barSize);
     bar.setOrigin(0.5f * barSize);
     bar.setPosition(margin, windowSize.y / 2);
-    bar.setFillColor(sf::Color(220, 220, 220));
+    bar.setFillColor(sf::Color(240, 240, 240));
 
     sf::RectangleShape midLine(sf::Vector2f(windowSize.x - (2 * margin), 1));
+    midLine.setFillColor(sf::Color(180, 180, 180));
     midLine.setOrigin(0.5f * midLine.getSize());
     midLine.setPosition(windowSize * 0.5f);
 
     sf::RectangleShape marker(markerSize);
-    marker.setFillColor(sf::Color(150, 150, 150));
+    marker.setFillColor(markerColor);
     marker.setOrigin(0.5f * markerSize);
 
     accents[0] = true;
@@ -97,6 +101,16 @@ int main()
                 if (event.key.code == sf::Keyboard::Right) {
                     signature++;
                 }
+
+                if (event.key.code == sf::Keyboard::R) {
+                    BPM = 120;
+                    signature = 4;
+                    accents[0] = true;
+
+                    for (int index = 1; index < maxSignature; index++) {
+                        accents[index] = false;
+                    }
+                }
             }
 
             if (event.type == sf::Event::Closed) {
@@ -106,7 +120,7 @@ int main()
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        float step = (windowSize.x - (2 * margin)) / (signature - 1);
+        float step = midLine.getSize().x / (signature - 1);
 
         if (signature != prevSignature) {
             prevSignature = signature;
@@ -137,15 +151,45 @@ int main()
         }
 
         bar.setScale(0.97f * bar.getScale());
-        bar.move(sf::Vector2f((windowSize.x - (2 * margin)) * 2.7 / (BPM * signature), 0));
+        float movestep = step * BPM / 7200;
+        bar.move(sf::Vector2f(movestep, 0));
 
         if (bar.getPosition().x > windowSize.x - margin) {
             bar.setPosition(sf::Vector2f(windowSize.x - margin, windowSize.y / 2));
         }
 
-        ImGui::Begin("Settings");
-        ImGui::InputInt("Beats per measure", &signature);
-        ImGui::InputInt("BPM", &BPM);
+        ImGuiWindowFlags windowSettings = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
+
+        ImGui::SetNextWindowPos(ImVec2(10, 10));
+
+        ImGui::Begin("Time Signature", NULL, windowSettings);
+        ImGui::Text("Time signature");
+        //ImGui::PushID("sign");
+        ImGui::PushItemWidth(100);
+        ImGui::InputInt("", &signature);
+        ImGui::PopItemWidth();
+        //ImGui::PopID();
+
+        ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowWidth() + 10 + 10, 10));
+        ImGui::SetNextWindowSize(ImVec2(0, 0));
+        ImGui::End();
+
+
+        ImGui::Begin("BPM", NULL, windowSettings);
+        ImGui::Text("BPM");
+        //ImGui::PushID("BPM");
+        ImGui::PushItemWidth(100);
+        ImGui::InputInt("", &BPM);
+        ImGui::PopItemWidth();
+        //ImGui::PopID();
+
+        ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowWidth() + 10 + 10, 10));
+        ImGui::SetNextWindowSize(ImVec2(0, 0));
+
+        ImGui::End();
+
+        ImGui::Begin(" Accents", NULL, windowSettings);
+        ImGui::Text("Accents");
         
         for (int i = 0; i < signature; i++) {
             ImGui::PushID(i);
@@ -173,11 +217,22 @@ int main()
         }
 
         window.clear(background);
+
+        window.draw(midLine);
+
         for (int i = 0; i < signature; i++) {
             marker.setPosition(margin + (step * i), windowSize.y / 2);
             window.draw(marker);
+
+            if (accents[i]) {
+                marker.setScale(2.f, 1.5f);
+                marker.setFillColor(accentMarkerColor);
+                window.draw(marker);
+                marker.setScale(1.f, 1.f);
+                marker.setFillColor(markerColor);
+            }
         }
-        window.draw(midLine);
+
         window.draw(bar);
         ImGui::SFML::Render(window);
         window.display();
