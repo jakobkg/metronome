@@ -7,5 +7,6 @@ To build, do:
 mkdir build && cd build
 conan install .. --build
 cmake ..
-make
 ```
+
+then build with whatever build system you prefer
