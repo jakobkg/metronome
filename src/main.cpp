@@ -1,5 +1,3 @@
-#include <sstream>
-
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include <imgui_stdlib.h>
