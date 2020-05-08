@@ -10,6 +10,8 @@ target_link_libraries(metronome ${CONAN_LIBS})
 
 file(COPY snd DESTINATION bin)
 
-if(GNU)
+if(MSVC)
+    target_compile_options(metronome PUBLIC /W4 /WX)
+else()
     target_compile_options(metronome PUBLIC -Wall -Wextra -Werror)
 endif()
