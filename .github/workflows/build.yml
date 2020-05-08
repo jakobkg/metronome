@@ -32,7 +32,11 @@ jobs:
         conan --version
      
     - name: Configure
-      run: mkdir build && cd build && conan install .. --build && cmake ..
+      run: |
+        mkdir build
+        cd build
+        conan install .. --build
+        cmake ..
 
     # Runs a set of commands using the runners shell
     - name: Build
