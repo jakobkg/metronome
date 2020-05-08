@@ -177,7 +177,7 @@ int main(void)
         }
 
         // Shrink the bar and move it to the right a little every frame
-        bar.setScale(0.97f * bar.getScale());
+        bar.setScale(0.98f * bar.getScale());
         float movestep = step * BPM / 7200;
         bar.move(sf::Vector2f(movestep, 0));
 
@@ -214,7 +214,7 @@ int main(void)
         ImGui::End();
 
         // This window auto-resizes to fill with checkboxes to set/unset beats as accented
-        ImGui::Begin(" Accents", NULL, windowSettings);
+        ImGui::Begin("Accents", NULL, windowSettings);
         ImGui::Text("Accents");
         
         for (int i = 0; i < signature; i++) {
