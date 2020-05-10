@@ -7,12 +7,15 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
-// Set window dimensions and background colors
+// Set window dimensions and background coloras SFML colour and C array
 constexpr int windowWidth = 1440;
 constexpr int windowHeight = 480;
 const sf::Vector2f windowSize(windowWidth, windowHeight);
-const sf::Color background(40, 40, 40);
+sf::Color backgroundColor(40, 40, 40);
+float bgColArray[] = {40.f / 255.f, 40.f / 255.f, 40.f / 255.f};
 constexpr int margin = 50;
+
+bool colorPicker = false;
 
 // Initial BPM setting, and bounds
 int BPM = 120;
@@ -65,7 +68,7 @@ int main(void)
 
     // Create the beat marker rectangle
     // There is only ever a single rectangle which is moved around and drawn multiple times per frame,
-    // instead of creating multiple instances of the same bar
+    // instead of creating multiple instances of the same rectangle
     sf::RectangleShape marker(markerSize);
     marker.setFillColor(markerColor);
     marker.setOrigin(0.5f * markerSize);
@@ -132,6 +135,11 @@ int main(void)
                         accents[index] = false;
                     }
                 }
+
+                // On B press, open a color picker to set background
+                if (event.key.code == sf::Keyboard::B) {
+                    colorPicker = !colorPicker;
+                }
             }
 
             if (event.type == sf::Event::Closed) {
@@ -162,11 +170,11 @@ int main(void)
             if (accents[beat - 1]) {
                 high.play();
                 bar.setScale(sf::Vector2f(1, 1.5));
-                bar.setFillColor(sf::Color(220, 220, 220));
+                bar.setFillColor(barColor);
             } else {
                 low.play();
                 bar.setScale(sf::Vector2f(1, 1));
-                bar.setFillColor(sf::Color(150, 150, 150));
+                bar.setFillColor(barColor - sf::Color(70, 70, 70, 0));
             }
 
             if (beat == signature) {
@@ -188,6 +196,7 @@ int main(void)
 
         // Settings for inner ImGui windows
         ImGuiWindowFlags windowSettings = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
+        ImGuiColorEditFlags pickerSettings = ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoOptions | ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_DisplayRGB;
 
         // Place first inner windows with a nice little margin from the top left corner of the main window
         ImGui::SetNextWindowPos(ImVec2(margin / 10, margin / 10));
@@ -224,7 +233,21 @@ int main(void)
             ImGui::SameLine();
         }
 
+        // Place next window nicely spaced again, and set its size to 0x0 (Dear ImGui auto-resizes this)
+        ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowWidth() + (margin / 10), margin / 10));
+        ImGui::SetNextWindowSize(ImVec2(0, 0));
+
         ImGui::End();
+
+        // If B has been pressed, a color picker to set a user preferred background colour is shown
+        // This is fairly trivial, ImGui::ColorPicker3 works with colors in the range 0-1 and SFML wants 0-255 so there's a small conversion
+        if (colorPicker) {
+            ImGui::Begin("Background color", NULL, windowSettings);
+            ImGui::PushItemWidth(200);
+            ImGui::ColorPicker3("", (float *)&bgColArray, pickerSettings);
+            ImGui::PopItemWidth();
+            backgroundColor = sf::Color(sf::Uint8(bgColArray[0] * 255), sf::Uint8(bgColArray[1] * 255), sf::Uint8(bgColArray[2] * 255));
+        }
 
         // Input clamping
         if (signature > maxSignature) {
@@ -244,7 +267,7 @@ int main(void)
         }
 
         // Draw the frame! Layers are background -> centerline -> beat markers -> metronome bar
-        window.clear(background);
+        window.clear(backgroundColor);
         window.draw(midLine);
 
         for (int i = 0; i < signature; i++) {
