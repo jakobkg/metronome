@@ -7,7 +7,7 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
-// Set window dimensions and background coloras SFML colour and C array
+// Set window dimensions and background color as SFML color and C array
 constexpr int windowWidth = 1440;
 constexpr int windowHeight = 480;
 const sf::Vector2f windowSize(windowWidth, windowHeight);
@@ -67,7 +67,7 @@ int main(void)
     midLine.setPosition(windowSize * 0.5f);
 
     // Create the beat marker rectangle
-    // There is only ever a single rectangle which is moved around and drawn multiple times per frame,
+    // There is only ever a single marker rectangle which is moved around and drawn multiple times per frame,
     // instead of creating multiple instances of the same rectangle
     sf::RectangleShape marker(markerSize);
     marker.setFillColor(markerColor);
